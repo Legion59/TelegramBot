@@ -1,0 +1,15 @@
+C:\Users\legio\Documents\GitHub\FirstRepo59\bin\Debug\net6.0\FirstRepo59.exe
+C:\Users\legio\Documents\GitHub\FirstRepo59\bin\Debug\net6.0\FirstRepo59.deps.json
+C:\Users\legio\Documents\GitHub\FirstRepo59\bin\Debug\net6.0\FirstRepo59.runtimeconfig.json
+C:\Users\legio\Documents\GitHub\FirstRepo59\bin\Debug\net6.0\FirstRepo59.dll
+C:\Users\legio\Documents\GitHub\FirstRepo59\bin\Debug\net6.0\ref\FirstRepo59.dll
+C:\Users\legio\Documents\GitHub\FirstRepo59\bin\Debug\net6.0\FirstRepo59.pdb
+C:\Users\legio\Documents\GitHub\FirstRepo59\obj\Debug\net6.0\FirstRepo59.csproj.AssemblyReference.cache
+C:\Users\legio\Documents\GitHub\FirstRepo59\obj\Debug\net6.0\FirstRepo59.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\legio\Documents\GitHub\FirstRepo59\obj\Debug\net6.0\FirstRepo59.AssemblyInfoInputs.cache
+C:\Users\legio\Documents\GitHub\FirstRepo59\obj\Debug\net6.0\FirstRepo59.AssemblyInfo.cs
+C:\Users\legio\Documents\GitHub\FirstRepo59\obj\Debug\net6.0\FirstRepo59.csproj.CoreCompileInputs.cache
+C:\Users\legio\Documents\GitHub\FirstRepo59\obj\Debug\net6.0\FirstRepo59.dll
+C:\Users\legio\Documents\GitHub\FirstRepo59\obj\Debug\net6.0\ref\FirstRepo59.dll
+C:\Users\legio\Documents\GitHub\FirstRepo59\obj\Debug\net6.0\FirstRepo59.pdb
+C:\Users\legio\Documents\GitHub\FirstRepo59\obj\Debug\net6.0\FirstRepo59.genruntimeconfig.cache
