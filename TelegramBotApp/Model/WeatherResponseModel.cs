@@ -24,6 +24,7 @@
         public decimal TempMin { get; set; }
         public decimal TempMax { get; set; }
         public int Pressure { get; set; }
+        public int Humidity { get; set; }
     }
 
     public class Wind
@@ -35,7 +36,7 @@
     public class Sys
     {
         public string Country { get; set; }
-        public string Sunrice { get; set; }
-        public string Sunset { get; set; }
+        public int Sunrise { get; set; }
+        public int Sunset { get; set; }
     }
 }
