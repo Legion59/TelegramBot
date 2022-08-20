@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotApp.Model;
-
 
 namespace TelegramBotApp.Services
 {
@@ -15,6 +15,9 @@ namespace TelegramBotApp.Services
     {
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IWeatherApiClient _weatherApiClient;
+
+        string location = null;
+
 
         public TelegramServices(ITelegramBotClient telegramBotClient, IWeatherApiClient weatherApiClient)
         {
@@ -33,20 +36,34 @@ namespace TelegramBotApp.Services
                     return;
                 }
 
-                if (update.Message.Equals("/start"))
+                if (update.Message.Text.Equals("/start"))
                 {
+                    await _telegramBotClient.SendStickerAsync(update.Message.Chat.Id, "CAACAgIAAxkBAAEFmoBi_y-b_JKwoTSHbZNz0YDDVvlmlQACHAAD9wLID3Acci1tkxh4KQQ", cancellationToken: cancellationToken);
+                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, $"Whelcome to Weather TelegramBot\U0001F600 \n" +
+                                                                  $"Please write the city where you would like to know the weather.", cancellationToken: cancellationToken);
                     return;
                 }
 
-                var location = update.Message.Text;
+                
 
-                var weatherInfo = await _weatherApiClient.GetCurrentWeatherByLocation(location, cancellationToken);
 
-                if (weatherInfo != null)
+                if (_weatherApiClient.CheckResponse(update.Message.Text).Result && location == null)
                 {
-                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, ConvertAndFormWeatherResponse(weatherInfo), cancellationToken: cancellationToken);
+                    location = update.Message.Text;
+               
+                    var keyboard = new  ReplyKeyboardMarkup(new KeyboardButton[] { new KeyboardButton("Current weather"), new KeyboardButton("Forecast on few days") });
+                    
+                    keyboard.ResizeKeyboard = true;
+
+                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "What weather?", replyMarkup: keyboard);
 
                     return;
+                }
+
+                if (update.Message.Text.Equals("Current weather"))
+                {
+                    var weatherInfo = await _weatherApiClient.GetCurrentWeatherByLocation(location, cancellationToken);
+                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, ConvertAndFormCurrentWeatherResponse(weatherInfo), cancellationToken: cancellationToken);
                 }
 
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, $"I cannot find your location by query {location}.", cancellationToken: cancellationToken);
@@ -59,10 +76,10 @@ namespace TelegramBotApp.Services
             }
         }
 
-        public string ConvertAndFormWeatherResponse(WeatherResponseModel weatherInfo)
+        public string ConvertAndFormCurrentWeatherResponse(WeatherResponseModel weatherInfo)
         {
             string city = weatherInfo.Name;
-            string weatherName = weatherInfo.Weather[0].Main;
+            string weatherDescription = weatherInfo.Weather[0].Description.ToUpperInvariant();
 
             //Convert temperature in integer Celsius
             int tempNow = (int)Math.Round(weatherInfo.Main.Temp);
@@ -77,7 +94,7 @@ namespace TelegramBotApp.Services
             int windSpeed = (int)Math.Round(weatherInfo.Wind.Speed);
 
             //Convert wind direction from Degrees to Compass Directions
-            string[] windDirections = { "N", "NE", "E", "SE", "S", "SW", "W", "NW", "N" };
+            string[] windDirections = { "North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West", "North" };
             string windDirection = windDirections[(int)Math.Round(weatherInfo.Wind.Deg / 45.0)];
 
             //Convert sunrise and sunset time from unix to normal time
@@ -91,12 +108,12 @@ namespace TelegramBotApp.Services
             var country = countryCodes.Where(x => x.Code == weatherInfo.Sys.Country).Select(x => x.Name).FirstOrDefault();
 
 
-            string result = $"Wheather in {city}, {country}\n" +
-                $"{weatherName}\n" +
-                $"Temperature {tempNow}°C,  Feels like {tempFeels}°C\n" +
-                $"Pressure {pressure} mmHg\n" +
-                $"Humidity {humidity}%\n" +
-                $"Wind speed {windSpeed} m/s, {windDirection}\n" +
+            string result = $"Wheather on today in {city}, {country}:\n" +
+                $"{weatherDescription} \u2600\n" +
+                $" -> Temperature: {tempNow}°C,  Feels like: {tempFeels}°C\n" +
+                $" -> Pressure: {pressure} mmHg\n" +
+                $" -> Humidity: {humidity}%\n" +
+                $" -> Wind speed: {windSpeed} m/s, {windDirection}\n" +
                 $"Sunrise in {sunriseTime.TimeOfDay}\n" +
                 $"Sunset in {sunsetTime.TimeOfDay}";
 

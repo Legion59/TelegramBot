@@ -5,7 +5,6 @@
         public string Name { get; set; }
         public Weather[] Weather { get; set; }
         public Main Main { get; set; }
-        public int Visibility { get; set; }
         public Wind Wind { get; set; }
         public Sys Sys { get; set; }
     }
