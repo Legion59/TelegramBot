@@ -39,7 +39,7 @@ namespace TelegramBotApp.Services
 
         public async Task<WeatherFiveDaysResponseModel> GetWeatherFiveDaysByLocation(string location, CancellationToken cancellationToken = default)
         {
-            var response = await _client.GetAsync($"/data/2.5/forecast?q={location}&appid={_apiKey}&units=metric", cancellationToken);
+            var response = await _client.GetAsync($"/data/2.5/forecast/daily?q={location}&cnt=5&appid={_apiKey}&units=metric", cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

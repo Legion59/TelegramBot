@@ -16,9 +16,6 @@ namespace TelegramBotApp.Services
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IWeatherApiClient _weatherApiClient;
 
-        string location = null;
-
-
         public TelegramServices(ITelegramBotClient telegramBotClient, IWeatherApiClient weatherApiClient)
         {
             _telegramBotClient = telegramBotClient;
@@ -44,9 +41,11 @@ namespace TelegramBotApp.Services
                     return;
                 }
 
-                
+                string location = update.Message.Text;
 
+                var weatherInfo = await _weatherApiClient.GetWeatherFiveDaysByLocation(location, cancellationToken);
 
+                /*
                 if (_weatherApiClient.CheckResponse(update.Message.Text).Result && location == null)
                 {
                     location = update.Message.Text;
@@ -64,6 +63,13 @@ namespace TelegramBotApp.Services
                 {
                     var weatherInfo = await _weatherApiClient.GetCurrentWeatherByLocation(location, cancellationToken);
                     await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, ConvertAndFormCurrentWeatherResponse(weatherInfo), cancellationToken: cancellationToken);
+                }*/
+
+                if (weatherInfo != null)
+                {
+                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, ConvertAndFormFiveDaysWeatherResponse(weatherInfo), cancellationToken: cancellationToken);
+
+                    return;
                 }
 
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, $"I cannot find your location by query {location}.", cancellationToken: cancellationToken);
@@ -79,7 +85,7 @@ namespace TelegramBotApp.Services
         public string ConvertAndFormCurrentWeatherResponse(WeatherResponseModel weatherInfo)
         {
             string city = weatherInfo.Name;
-            string weatherDescription = weatherInfo.Weather[0].Description.ToUpperInvariant();
+            string weatherDescription = weatherInfo.Weather[0].Description.ToUpper();
 
             //Convert temperature in integer Celsius
             int tempNow = (int)Math.Round(weatherInfo.Main.Temp);
@@ -109,13 +115,63 @@ namespace TelegramBotApp.Services
 
 
             string result = $"Wheather on today in {city}, {country}:\n" +
-                $"{weatherDescription} \u2600\n" +
-                $" -> Temperature: {tempNow}°C,  Feels like: {tempFeels}°C\n" +
-                $" -> Pressure: {pressure} mmHg\n" +
-                $" -> Humidity: {humidity}%\n" +
-                $" -> Wind speed: {windSpeed} m/s, {windDirection}\n" +
-                $"Sunrise in {sunriseTime.TimeOfDay}\n" +
-                $"Sunset in {sunsetTime.TimeOfDay}";
+                        $"{weatherDescription}\n" +
+                        $" -> Temperature: {tempNow}°C,  Feels like: {tempFeels}°C\n" +
+                        $" -> Pressure: {pressure} mmHg\n" +
+                        $" -> Humidity: {humidity}%\n" +
+                        $" -> Wind speed: {windSpeed} m/s, {windDirection}\n" +
+                        $"Sunrise in {sunriseTime.TimeOfDay}\n" +
+                        $"Sunset in {sunsetTime.TimeOfDay}";
+
+            return result;
+        }
+
+        public string ConvertAndFormFiveDaysWeatherResponse(WeatherFiveDaysResponseModel weatherInfoOnFiveDays)
+        {
+            string result = null;
+            string[] windDirections = { "North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West", "North" };
+
+            string city = weatherInfoOnFiveDays.City.Name;
+
+            //Convert Country ISO Code to Full Name
+            var countryCodesText = System.IO.File.ReadAllText(@"C:\Users\Admin\Documents\TelegramBot\TelegramBotApp\TelegramBotApp\Data\Country codes (ISO 3166-1 alpha-2).json");
+            var countryCodes = JsonConvert.DeserializeObject<CountryNameFromCodeModel[]>(countryCodesText);
+            var country = countryCodes.Where(x => x.Code == weatherInfoOnFiveDays.City.Country).Select(x => x.Name).FirstOrDefault();
+
+
+            result += $"Forecast in {city}, {country}\n\n";
+
+
+            foreach (var weather in weatherInfoOnFiveDays.List)
+            {
+                //Convert temperature in integer Celsius
+                int tempMin = (int)Math.Round(weather.Temp.Min);
+                int tempMax = (int)Math.Round(weather.Temp.Max);
+
+                //Convert pressure from hPa in mmHg
+                double pressure = Math.Round(weather.Pressure / 1.333);
+
+                int humidity = weather.Humidity;
+                int windSpeed = (int)Math.Round(weather.Speed);
+
+                //Convert wind direction from Degrees to Compass Directions
+                string windDirection = windDirections[(int)Math.Round(weather.Deg / 45.0)];
+
+                //Convert sunrise and sunset time from unix to normal time
+                DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                DateTime dateReport = dateTime.AddSeconds(weather.Dt).ToLocalTime();
+                DateTime sunriseTime = dateTime.AddSeconds(weather.Sunrise).ToLocalTime();
+                DateTime sunsetTime = dateTime.AddSeconds(weather.Sunset).ToLocalTime();
+
+                result += $"The weather report on {dateReport.Date.ToString("d")}\n" +
+                        $"{weather.Weather[0].Description.ToUpper()}\n" +
+                        $" —> Temperature min/max: {tempMin}°C / {tempMax}°C\n" +
+                        $" —> Pressure: {pressure} mmHg\n" +
+                        $" —> Humidity: {humidity}%\n" +
+                        $" —> Wind speed: {windSpeed} m/s, {windDirection}\n" +
+                        $"Sunrise: {sunriseTime.TimeOfDay}\n" +
+                        $"Sunset: {sunsetTime.TimeOfDay}\n\n\n";
+            }
 
             return result;
         }
