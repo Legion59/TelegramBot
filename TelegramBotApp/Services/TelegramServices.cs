@@ -7,6 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBotApp.Database;
 using TelegramBotApp.Model;
 
 namespace TelegramBotApp.Services
@@ -41,32 +42,48 @@ namespace TelegramBotApp.Services
                     return;
                 }
 
+
                 string location = update.Message.Text;
 
-                var weatherInfo = await _weatherApiClient.GetWeatherFiveDaysByLocation(location, cancellationToken);
+                await using var dbContext = new LocationMessageDbContext();
 
-                /*
-                if (_weatherApiClient.CheckResponse(update.Message.Text).Result && location == null)
+                if (_weatherApiClient.CheckResponse(update.Message.Text).Result)
                 {
-                    location = update.Message.Text;
-               
                     var keyboard = new  ReplyKeyboardMarkup(new KeyboardButton[] { new KeyboardButton("Current weather"), new KeyboardButton("Forecast on few days") });
                     
                     keyboard.ResizeKeyboard = true;
 
-                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "What weather?", replyMarkup: keyboard);
+                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Please select from the below menu", replyMarkup: keyboard);
+
+                    await dbContext.locationMessages.AddAsync(new LocationMessageModel
+                    {
+                        MessageId = update.Message.MessageId,
+                        ChatId = update.Message.Chat.Id,
+                        MessageText = update.Message.Text,
+                        MessageTime = DateTime.Now
+                    });
+
+                    await dbContext.SaveChangesAsync();
 
                     return;
                 }
 
                 if (update.Message.Text.Equals("Current weather"))
                 {
+                    location = dbContext.locationMessages.OrderByDescending(x => x.MessageTime).FirstOrDefault().MessageText;
+
                     var weatherInfo = await _weatherApiClient.GetCurrentWeatherByLocation(location, cancellationToken);
                     await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, ConvertAndFormCurrentWeatherResponse(weatherInfo), cancellationToken: cancellationToken);
-                }*/
 
-                if (weatherInfo != null)
+                    return;
+                }
+
+                if (update.Message.Text.Equals("Forecast on few days"))
                 {
+                    location = dbContext.locationMessages.OrderByDescending(x => x.MessageTime).FirstOrDefault().MessageText;
+
+                    var weatherInfo = await _weatherApiClient.GetWeatherFiveDaysByLocation(location, cancellationToken);
+
                     await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, ConvertAndFormFiveDaysWeatherResponse(weatherInfo), cancellationToken: cancellationToken);
 
                     return;
