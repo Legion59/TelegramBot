@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
-using TelegramBotApp.Services;
+using TelegramBotApp.Services.TelegramSevices;
 
 namespace TelegramBotApp.Controllers
 {

@@ -2,7 +2,7 @@
 
 namespace TelegramBotApp.Model
 {
-    public class WeatherFiveDaysResponseModel
+    public class ForecastResponseModel
     {
         public City City { get; set; }
 

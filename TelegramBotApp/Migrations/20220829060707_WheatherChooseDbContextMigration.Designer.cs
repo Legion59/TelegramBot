@@ -11,9 +11,9 @@ using TelegramBotApp.Database;
 
 namespace TelegramBotApp.Migrations
 {
-    [DbContext(typeof(LocationMessageDbContext))]
-    [Migration("20220823145124_InitialCreate")]
-    partial class InitialCreate
+    [DbContext(typeof(WheatherChooseDbContext))]
+    [Migration("20220829060707_WheatherChooseDbContextMigration")]
+    partial class WheatherChooseDbContextMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,25 +24,31 @@ namespace TelegramBotApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("TelegramBotApp.Model.LocationMessageModel", b =>
+            modelBuilder.Entity("TelegramBotApp.Model.WheatherChooseModel", b =>
                 {
-                    b.Property<int>("MessageId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<long>("ChatId")
-                        .HasColumnType("bigint");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("MessageText")
+                    b.Property<string>("ChooseMessageText")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int>("MessageId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("MessageTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("MessageId");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
-                    b.ToTable("locationMessages");
+                    b.HasKey("Id");
+
+                    b.ToTable("chooseMessages");
                 });
 #pragma warning restore 612, 618
         }

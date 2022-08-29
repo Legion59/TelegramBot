@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TelegramBotApp.Model;
 
-namespace TelegramBotApp.Services
+namespace TelegramBotApp.Services.WeatherServices
 {
     public class WeatherApiClient : IWeatherApiClient
     {
@@ -37,7 +37,7 @@ namespace TelegramBotApp.Services
             return result;
         }
 
-        public async Task<WeatherFiveDaysResponseModel> GetWeatherFiveDaysByLocation(string location, CancellationToken cancellationToken = default)
+        public async Task<ForecastResponseModel> GetWeatherFiveDaysByLocation(string location, CancellationToken cancellationToken = default)
         {
             var response = await _client.GetAsync($"/data/2.5/forecast/daily?q={location}&cnt=5&appid={_apiKey}&units=metric", cancellationToken);
 
@@ -47,7 +47,7 @@ namespace TelegramBotApp.Services
             }
 
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
-            var result = JsonConvert.DeserializeObject<WeatherFiveDaysResponseModel>(content, _settings);
+            var result = JsonConvert.DeserializeObject<ForecastResponseModel>(content, _settings);
 
             return result;
         }
