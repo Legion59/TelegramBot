@@ -18,6 +18,7 @@ namespace TelegramBotApp.Services.TelegramSevices
     {
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IWeatherApiClient _weatherApiClient;
+        private readonly BotConfiguration _botConfiguration;
 
         public TelegramServices(ITelegramBotClient telegramBotClient, IWeatherApiClient weatherApiClient)
         {
@@ -50,7 +51,7 @@ namespace TelegramBotApp.Services.TelegramSevices
                     return;
                 }
 
-                await using var dbContext = new WheatherChooseDbContext();
+                await using var dbContext = new WheatherChooseDbContext(_botConfiguration);
 
                 if (update.Message.Text.Equals("/current") || update.Message.Text.Equals("/forecast"))
                 {
