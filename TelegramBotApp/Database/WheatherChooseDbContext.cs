@@ -5,15 +5,17 @@ namespace TelegramBotApp.Database
 {
     public class WheatherChooseDbContext : DbContext
     {
-        public WheatherChooseDbContext() : base()
+        private readonly BotConfiguration _botConfiguration;
+        public WheatherChooseDbContext(BotConfiguration botConfiguration) : base()
         {
+            _botConfiguration = botConfiguration;
         }
 
         public DbSet<WheatherChooseModel> chooseMessages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=DESKTOP-FNOV9O5\SQLEXPRESS;Database=TelegramBotWeatherDb;Trusted_Connection=True;");
+            optionsBuilder.UseSqlServer(_botConfiguration.ConnectionString);
         }
     }
 }
