@@ -56,7 +56,14 @@ namespace BeetrootTgBot
 
             services.AddTransient<ITelegramServices, TelegramServices>();
 
+            services.AddTransient<ICoolRepository, CoolRepository>();
+
             services.AddHostedService<InitService>();
+
+            services.AddDbContext<WeatherDbContext>(options =>
+            {
+                options.UseSqlServer(botConfiguration.ConnectionString);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Linq;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -8,8 +6,6 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBotApp.Database;
-using TelegramBotApp.Model;
-using TelegramBotApp.Model.DatabaseModel;
 using TelegramBotApp.Services.WeatherServices;
 
 namespace TelegramBotApp.Services.TelegramSevices
@@ -18,12 +14,13 @@ namespace TelegramBotApp.Services.TelegramSevices
     {
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IWeatherApiClient _weatherApiClient;
-        private readonly BotConfiguration _botConfiguration;
+        private readonly ICoolRepository _coolRepository;
 
-        public TelegramServices(ITelegramBotClient telegramBotClient, IWeatherApiClient weatherApiClient)
+        public TelegramServices(ITelegramBotClient telegramBotClient, IWeatherApiClient weatherApiClient, ICoolRepository coolRepository)
         {
             _telegramBotClient = telegramBotClient;
             _weatherApiClient = weatherApiClient;
+            _coolRepository = coolRepository;
         }
 
         public async Task HandleMessege(Update update, CancellationToken cancellationToken = default)
@@ -51,19 +48,9 @@ namespace TelegramBotApp.Services.TelegramSevices
                     return;
                 }
 
-                await using var dbContext = new WheatherChooseDbContext(_botConfiguration);
-
                 if (update.Message.Text.Equals("/current") || update.Message.Text.Equals("/forecast"))
                 {
-                    await dbContext.chooseMessages.AddAsync(new WheatherChooseModel
-                    {
-                        UserId = update.Message.From.Id,
-                        MessageId = update.Message.MessageId,
-                        ChooseMessageText = update.Message.Text,
-                        MessageTime = DateTime.Now
-                    });
-
-                    await dbContext.SaveChangesAsync();
+                    await _coolRepository.AddWeatherCommand(update);
 
                     await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Write a location for the weather", cancellationToken: cancellationToken);
 
@@ -71,17 +58,7 @@ namespace TelegramBotApp.Services.TelegramSevices
                 }
 
 
-                if (dbContext.chooseMessages == null)
-                {
-                    await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Эй, кожаный ублюдок!!! \nТебе же сказали, выбери сначала какая погода тебе нужна, текущая или на 5 дней, идиот!", cancellationToken: cancellationToken);
-
-                    return;
-                }
-
-
-                var wheatherChoose = dbContext.chooseMessages.Where(x => x.UserId == update.Message.From.Id).OrderByDescending(x => x.MessageTime).FirstOrDefault().ChooseMessageText;
-
-                if (wheatherChoose.Equals("/current"))
+                if (_coolRepository.GetLastUserCommand(update.Message.From.Id).Equals("/current"))
                 {
                     var location = update.Message.Text;
 
@@ -89,7 +66,7 @@ namespace TelegramBotApp.Services.TelegramSevices
 
                     if (weatherInfo != null)
                     {
-                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, weatherInfo.CreateWeatherMessage(), cancellationToken: cancellationToken);
+                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, weatherInfo.CreateWeatherMessage(_coolRepository), cancellationToken: cancellationToken);
                     }
                     else
                     {
@@ -100,15 +77,15 @@ namespace TelegramBotApp.Services.TelegramSevices
                 }
 
 
-                if (wheatherChoose.Equals("/forecast"))
+                if (_coolRepository.GetLastUserCommand(update.Message.From.Id).Equals("/forecast"))
                 {
                     var location = update.Message.Text;
 
-                    var forecastInfo = await _weatherApiClient.GetWeatherFiveDaysByLocation(location, cancellationToken);
+                    var forecastInfo = await _weatherApiClient.GetForecastByLocation(location, cancellationToken);
 
                     if (forecastInfo != null)
                     {
-                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, forecastInfo.CreateForecastMessage(), cancellationToken: cancellationToken);
+                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, forecastInfo.CreateForecastMessage(_coolRepository), cancellationToken: cancellationToken);
                     }
                     else
                     {

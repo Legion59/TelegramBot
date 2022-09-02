@@ -11,9 +11,9 @@ using TelegramBotApp.Database;
 
 namespace TelegramBotApp.Migrations
 {
-    [DbContext(typeof(WheatherChooseDbContext))]
-    [Migration("20220829060707_WheatherChooseDbContextMigration")]
-    partial class WheatherChooseDbContextMigration
+    [DbContext(typeof(WeatherDbContext))]
+    [Migration("20220901122849_CoolRepoMigration")]
+    partial class CoolRepoMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,7 +24,26 @@ namespace TelegramBotApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("TelegramBotApp.Model.WheatherChooseModel", b =>
+            modelBuilder.Entity("TelegramBotApp.Model.DatabaseModel.CountryNameFromCodeModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CountryNames");
+                });
+
+            modelBuilder.Entity("TelegramBotApp.Model.DatabaseModel.WheatherChooseModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,7 +67,7 @@ namespace TelegramBotApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("chooseMessages");
+                    b.ToTable("CommandMessages");
                 });
 #pragma warning restore 612, 618
         }

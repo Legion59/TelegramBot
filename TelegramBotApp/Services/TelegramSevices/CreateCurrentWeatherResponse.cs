@@ -19,13 +19,12 @@ namespace TelegramBotApp.Services.TelegramSevices
         static DateTime SunriseTime { get; set; }
         static DateTime SunsetTime { get; set; }
 
-        static async void ConvertWeatherInfo(WeatherResponseModel weatherInfo)
+        static void ConvertWeatherInfo(WeatherResponseModel weatherInfo, ICoolRepository coolRepository)
         {
             CityName = weatherInfo.Name;
 
             //Convert Country ISO Code to Full Name
-            await using var dbContext = new CountryNameDbContext();
-            CountryName = dbContext.countryNames.Where(x => x.Code == weatherInfo.Sys.Country).FirstOrDefault().Name;
+            CountryName = coolRepository.GetCountryNameByCode(weatherInfo.Sys.Country);
 
             WeatherDscription = weatherInfo.Weather[0].Description.ToUpper();
 
@@ -49,9 +48,9 @@ namespace TelegramBotApp.Services.TelegramSevices
             SunsetTime = dateTime.AddSeconds(weatherInfo.Sys.Sunset).ToLocalTime();
         }
 
-        public static string CreateWeatherMessage(this WeatherResponseModel weatherInfo)
+        public static string CreateWeatherMessage(this WeatherResponseModel weatherInfo, ICoolRepository coolRepository)
         {
-            ConvertWeatherInfo(weatherInfo);
+            ConvertWeatherInfo(weatherInfo, coolRepository);
 
             string result = $"Wheather on today in {CityName}, {CountryName}:\n" +
                         $"{WeatherDscription}\n" +

@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TelegramBotApp.Migrations
 {
-    public partial class WheatherChooseDbContextMigration : Migration
+    public partial class CoolRepoMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "chooseMessages",
+                name: "CommandMessages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -22,14 +22,31 @@ namespace TelegramBotApp.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_chooseMessages", x => x.Id);
+                    table.PrimaryKey("PK_CommandMessages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CountryNames",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CountryNames", x => x.Id);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "chooseMessages");
+                name: "CommandMessages");
+
+            migrationBuilder.DropTable(
+                name: "CountryNames");
         }
     }
 }

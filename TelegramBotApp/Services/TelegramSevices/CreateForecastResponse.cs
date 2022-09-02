@@ -14,15 +14,14 @@ namespace TelegramBotApp.Services.TelegramSevices
 
         static List<ForecastReport> forecastReports = new List<ForecastReport>();
 
-        static async void ConvertForecastInfo(ForecastResponseModel forecastInfo)
+        static void ConvertForecastInfo(ForecastResponseModel forecastInfo, ICoolRepository coolRepository)
         {
             string[] windDirections = { "North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West", "North" };
 
             CityName = forecastInfo.City.Name;
 
             //Convert Country ISO Code to Full Name
-            await using var dbContext = new CountryNameDbContext();
-            CountryName = dbContext.countryNames.Where(x => x.Code == forecastInfo.City.Country).FirstOrDefault().Name;
+            CountryName = coolRepository.GetCountryNameByCode(forecastInfo.City.Country);
 
 
             foreach (var weather in forecastInfo.List)
@@ -54,9 +53,9 @@ namespace TelegramBotApp.Services.TelegramSevices
             }
         }
 
-        public static string CreateForecastMessage(this ForecastResponseModel forecastInfo)
+        public static string CreateForecastMessage(this ForecastResponseModel forecastInfo, ICoolRepository coolRepository)
         {
-            ConvertForecastInfo(forecastInfo);
+            ConvertForecastInfo(forecastInfo, coolRepository);
             string result = null;
 
             result += $"Forecast in {CityName}, {CountryName}\n\n";
