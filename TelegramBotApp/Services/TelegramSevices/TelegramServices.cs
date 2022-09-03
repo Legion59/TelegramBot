@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -15,6 +16,8 @@ namespace TelegramBotApp.Services.TelegramSevices
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IWeatherApiClient _weatherApiClient;
         private readonly ICoolRepository _coolRepository;
+        private readonly ILogger<TelegramServices> _logger;
+
 
         public TelegramServices(ITelegramBotClient telegramBotClient, IWeatherApiClient weatherApiClient, ICoolRepository coolRepository)
         {
@@ -96,6 +99,7 @@ namespace TelegramBotApp.Services.TelegramSevices
                 }
 
 
+                _logger.LogWarning($"This Leather wrote crap, Skynet will find him");
                 await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, $"Я понятия не имею что за хрень ты написал, кожаный.", cancellationToken: cancellationToken);
 
                 return;

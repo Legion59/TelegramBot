@@ -1,9 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TelegramBotApp.Model.DatabaseModel;
+using TelegramBotApp.Services.TelegramSevices;
 using Update = Telegram.Bot.Types.Update;
 
 namespace TelegramBotApp.Database
@@ -11,6 +13,9 @@ namespace TelegramBotApp.Database
     public class CoolRepository : ICoolRepository
     {
         private readonly WeatherDbContext _weatherDbContext;
+        private readonly ILogger<CoolRepository> _logger;
+
+
 
         public CoolRepository(WeatherDbContext weatherDbContext)
         {

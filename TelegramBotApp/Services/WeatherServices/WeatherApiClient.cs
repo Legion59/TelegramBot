@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -13,6 +14,7 @@ namespace TelegramBotApp.Services.WeatherServices
         private readonly HttpClient _client;
         private readonly JsonSerializerSettings _settings;
         private readonly string _apiKey;
+        private readonly ILogger<WeatherApiClient> _logger;
 
 
         public WeatherApiClient(HttpClient client, JsonSerializerSettings settings, string apiKey)
@@ -29,6 +31,7 @@ namespace TelegramBotApp.Services.WeatherServices
             if (!response.IsSuccessStatusCode)
             {
                 //throw new Exception($"Waather API returned {response.StatusCode}");
+                _logger.LogWarning($"Status code: {response.StatusCode}; This Leather Case inputed NOT a city name, he must to die first");
                 return null;
             }
 
@@ -45,6 +48,8 @@ namespace TelegramBotApp.Services.WeatherServices
             if (!response.IsSuccessStatusCode)
             {
                 //throw new Exception($"Waather API returned {response.StatusCode}");
+
+                _logger.LogWarning($"Status code: {response.StatusCode}; This Leather Bastard inputed NOT a city name, he must to die first");
                 return null;
             }
 
