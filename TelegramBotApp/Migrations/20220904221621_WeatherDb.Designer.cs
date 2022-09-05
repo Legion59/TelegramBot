@@ -12,8 +12,8 @@ using TelegramBotApp.Database;
 namespace TelegramBotApp.Migrations
 {
     [DbContext(typeof(WeatherDbContext))]
-    [Migration("20220901122849_CoolRepoMigration")]
-    partial class CoolRepoMigration
+    [Migration("20220904221621_WeatherDb")]
+    partial class WeatherDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -68,6 +68,16 @@ namespace TelegramBotApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CommandMessages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ChooseMessageText = "Best Text",
+                            MessageId = 42,
+                            MessageTime = new DateTime(2022, 9, 5, 1, 16, 21, 418, DateTimeKind.Local).AddTicks(1160),
+                            UserId = 42L
+                        });
                 });
 #pragma warning restore 612, 618
         }

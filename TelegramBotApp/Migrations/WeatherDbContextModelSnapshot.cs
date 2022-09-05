@@ -66,6 +66,16 @@ namespace TelegramBotApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CommandMessages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ChooseMessageText = "Best Text",
+                            MessageId = 42,
+                            MessageTime = new DateTime(2022, 9, 5, 1, 16, 21, 418, DateTimeKind.Local).AddTicks(1160),
+                            UserId = 42L
+                        });
                 });
 #pragma warning restore 612, 618
         }

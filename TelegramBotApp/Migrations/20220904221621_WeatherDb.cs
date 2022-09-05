@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TelegramBotApp.Migrations
 {
-    public partial class CoolRepoMigration : Migration
+    public partial class WeatherDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -38,6 +38,11 @@ namespace TelegramBotApp.Migrations
                 {
                     table.PrimaryKey("PK_CountryNames", x => x.Id);
                 });
+
+            migrationBuilder.InsertData(
+                table: "CommandMessages",
+                columns: new[] { "Id", "ChooseMessageText", "MessageId", "MessageTime", "UserId" },
+                values: new object[] { 1, "Best Text", 42, new DateTime(2022, 9, 5, 1, 16, 21, 418, DateTimeKind.Local).AddTicks(1160), 42L });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

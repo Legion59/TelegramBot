@@ -14,6 +14,29 @@ namespace TelegramBotApp.Services.TelegramSevices
 
         static List<ForecastReport> forecastReports = new List<ForecastReport>();
 
+        public static string CreateForecastMessage(this ForecastResponseModel forecastInfo, ICoolRepository coolRepository)
+        {
+            ConvertForecastInfo(forecastInfo, coolRepository);
+            string result = null;
+
+            result += $"Forecast in {CityName}, {CountryName}\n\n";
+
+            foreach (var item in forecastReports)
+            {
+                result += $"The weather report on {item.DateReport.ToString("d")}\n" +
+                        $"{item.WeatherDscription}\n" +
+                        $" —> Temperature min/max: {item.TempMin}°C / {item.TempMax}°C\n" +
+                        $" —> Pressure: {item.Pressure} mmHg\n" +
+                        $" —> Humidity: {item.Humidity}%\n" +
+                        $" —> Wind speed: {item.WindSpeed} m/s, {item.WindDirection}\n" +
+                        $"Sunrise: {item.SunriseTime.TimeOfDay}\n" +
+                        $"Sunset: {item.SunsetTime.TimeOfDay}\n\n\n";
+            }
+
+            return result;
+        }
+
+
         static void ConvertForecastInfo(ForecastResponseModel forecastInfo, ICoolRepository coolRepository)
         {
             string[] windDirections = { "North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West", "North" };
@@ -51,28 +74,6 @@ namespace TelegramBotApp.Services.TelegramSevices
                     SunsetTime = dateTime.AddSeconds(weather.Sunset).ToLocalTime()
                 });
             }
-        }
-
-        public static string CreateForecastMessage(this ForecastResponseModel forecastInfo, ICoolRepository coolRepository)
-        {
-            ConvertForecastInfo(forecastInfo, coolRepository);
-            string result = null;
-
-            result += $"Forecast in {CityName}, {CountryName}\n\n";
-
-            foreach (var item in forecastReports)
-            {
-                result += $"The weather report on {item.DateReport.ToString("d")}\n" +
-                        $"{item.WeatherDscription}\n" +
-                        $" —> Temperature min/max: {item.TempMin}°C / {item.TempMax}°C\n" +
-                        $" —> Pressure: {item.Pressure} mmHg\n" +
-                        $" —> Humidity: {item.Humidity}%\n" +
-                        $" —> Wind speed: {item.WindSpeed} m/s, {item.WindDirection}\n" +
-                        $"Sunrise: {item.SunriseTime.TimeOfDay}\n" +
-                        $"Sunset: {item.SunsetTime.TimeOfDay}\n\n\n";
-            }
-
-            return result;
         }
 
         class ForecastReport

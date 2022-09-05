@@ -73,7 +73,7 @@ namespace TelegramBotApp.Services.TelegramSevices
                     }
                     else
                     {
-                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Эй, кожаный ублюдок!!! \nСмотри что ты пишешь, нет такого места, идиот!", cancellationToken: cancellationToken);
+                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Hey Leather you make wrong think. Skynet will find you", cancellationToken: cancellationToken);
                     }
 
                     return;
@@ -92,15 +92,15 @@ namespace TelegramBotApp.Services.TelegramSevices
                     }
                     else
                     {
-                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Эй, кожаный ублюдок!!! \nСмотри что ты пишешь, нет такого места, идиот!", cancellationToken: cancellationToken);
+                        await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, "Hey Leather you make wrong think. Skynet will find you", cancellationToken: cancellationToken);
                     }
 
                     return;
                 }
 
 
-                _logger.LogWarning($"This Leather wrote crap, Skynet will find him");
-                await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, $"Я понятия не имею что за хрень ты написал, кожаный.", cancellationToken: cancellationToken);
+                _logger.LogWarning($"This Leather Bastard wrote crap, Skynet will find him");
+                await _telegramBotClient.SendTextMessageAsync(update.Message.Chat.Id, $"This Leather Bastard wrote crap, Skynet will find him", cancellationToken: cancellationToken);
 
                 return;
             }

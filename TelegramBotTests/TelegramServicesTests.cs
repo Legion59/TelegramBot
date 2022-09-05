@@ -21,18 +21,31 @@ namespace TelegramBotTests
         }
 
         [Fact]
-        public void HandleMessege_ShoudReturnSameCommandFromTheBaseAsInText()
+        public async Task HandleMessege_ShoudAddCommadInDb()
         {
             //Arrange
-            Update command = new Update();
-            command.Message.Text = "/current";
-
+            Update commandCurrent = new Update
+            {
+                Message = new Telegram.Bot.Types.Message
+                {
+                    Text = "/current"
+                }
+            };
+            Update commandForecast = new Update
+            {
+                Message = new Telegram.Bot.Types.Message
+                {
+                    Text = "/forecast"
+                }
+            };
 
             //Act
-            _ = _telegramServicesTest.HandleMessege(command);
+            await _telegramServicesTest.HandleMessege(commandCurrent);
+            await _telegramServicesTest.HandleMessege(commandForecast);
 
             //Assert
-            Assert.Equal
+            _coolRepoMock.Verify(x => x.AddWeatherCommand(commandCurrent), Times.Once());
+            _coolRepoMock.Verify(x => x.AddWeatherCommand(commandForecast), Times.Once());
         }
     }
 } 
